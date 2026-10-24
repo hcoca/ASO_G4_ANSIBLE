@@ -1,0 +1,18 @@
+---
+# Defaults for MariaDB role
+mariadb_packages:
+  - mariadb
+  - mariadb-client
+  - python3-PyMySQL
+
+mariadb_service: mariadb
+mariadb_socket: /run/mysql/mysql.sock
+
+# Credentials should be overridden in group_vars/servidor/vault.yml
+mariadb_root_password: "{{ vault_mariadb_root_password | default('RootDBPassword2026!') }}"
+
+# Database and application user configuration
+mariadb_database: "{{ mariadb_db_name | default('lamp_db') }}"
+mariadb_user: "{{ mariadb_db_user | default('lamp_user') }}"
+mariadb_password: "{{ vault_mariadb_user_password | default('AppDBPassword2026!') }}"
+mariadb_privileges: "{{ mariadb_database }}.*:ALL"

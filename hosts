@@ -1,6 +1,25 @@
 [servidor]
-192.168.88.141  ansible_user=root ansible_password=mundolibre ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+opensuse_server ansible_host=192.168.1.70
+opensuse_server_74 ansible_host=192.168.1.74
 
-[respaldo]
-192.168.88.21
-192.168.88.22
+[servidor:vars]
+ansible_user=root
+
+# ==============================================================================
+# Security Improvement: No Plaintext Passwords
+# ==============================================================================
+# Passwords are not hardcoded in plaintext. Choose one of the following methods:
+#
+# 1. SSH Key Authentication (Recommended Best Practice):
+#    Run on control machine: ssh-copy-id root@192.168.1.71
+#    Or specify key: ansible_ssh_private_key_file=~/.ssh/id_rsa
+#
+# 2. Ansible Vault (Encrypted Password):
+#    Store the password in group_vars/servidor/vault.yml and encrypt it:
+#    ansible-vault encrypt group_vars/servidor/vault.yml
+#    ansible_password="{{ vault_ansible_password }}"
+#
+# 3. Interactive prompt (No password stored anywhere):
+#    ansible-playbook playbook.yml --ask-pass
+# ==============================================================================
+ansible_password="{{ vault_ansible_password | default(omit) }}"

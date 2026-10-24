@@ -1,0 +1,56 @@
+---
+- name: Instalar MariaDB y dependencias de Python para Ansible
+  community.general.zypper:
+    name: "{{ mariadb_packages }}"
+    state: present
+
+- name: Habilitar y arrancar el servicio MariaDB
+  ansible.builtin.systemd:
+    name: "{{ mariadb_service }}"
+    enabled: true
+    state: started
+
+- name: Verificar si existe /root/.my.cnf
+  ansible.builtin.stat:
+    path: /root/.my.cnf
+  register: root_my_cnf
+
+- name: Configurar contrasena de root de MariaDB (inicializacion)
+  ansible.builtin.shell: >
+    mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mariadb_root_password }}'; FLUSH PRIVILEGES;"
+  when: not root_my_cnf.stat.exists
+  no_log: true
+  ignore_errors: true
+
+- name: Eliminar usuarios anonimos de MariaDB
+  community.mysql.mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+  ignore_errors: true
+
+- name: Eliminar base de datos de prueba (test)
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+  ignore_errors: true
+
+- name: Crear base de datos de aplicacion
+  community.mysql.mysql_db:
+    name: "{{ mariadb_database }}"
+    state: present
+    collation: utf8mb4_unicode_ci
+    encoding: utf8mb4
+
+- name: Crear usuario de aplicacion en MariaDB y otorgar permisos
+  community.mysql.mysql_user:
+    name: "{{ mariadb_user }}"
+    password: "{{ mariadb_password }}"
+    priv: "{{ mariadb_privileges }}"
+    host: "{{ item }}"
+    state: present
+  loop:
+    - "localhost"
+    - "127.0.0.1"
+    - "%"
+  no_log: true

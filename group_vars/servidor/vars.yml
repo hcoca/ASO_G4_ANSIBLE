@@ -1,0 +1,24 @@
+---
+# Non-sensitive variables for host group 'servidor'
+# Target OS: OpenSUSE Leap 15.6 / OpenSUSE Leap 16.0
+
+# Apache / PHP settings
+apache_port: 80
+apache_server_admin: admin@local.net
+
+# MariaDB settings
+mariadb_db_name: lamp_db
+mariadb_db_user: lamp_user
+
+# Samba settings
+samba_share_name: compartido
+samba_share_path: /srv/samba/compartido
+samba_system_user: smbuser
+samba_system_group: smbgroup
+samba_create_mask: "0664"
+samba_directory_mask: "0775"
+
+# PostgreSQL settings
+postgresql_db_name: app_db
+postgresql_db_user: app_user
+

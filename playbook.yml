@@ -1,5 +1,20 @@
-- name: Instalar y configurar vsftpd en openSUSE
+---
+# ==============================================================================
+# Ansible Playbook: Despliegue LAMP en openSUSE Leap 15.6 / 16.0
+# Task 3: Apache, PHP, phpMyAdmin, MariaDB y VSFTPD
+# ==============================================================================
+- name: Desplegar infraestructura LAMP y FTP (Apache, PHP, MariaDB, phpMyAdmin y vsftpd)
   hosts: servidor
-  become: yes
+  become: true
   roles:
-    - vsftpd
+    - role: vsftpd
+      tags: [ftp, vsftpd]
+
+    - role: apache
+      tags: [lamp, apache, web]
+
+    - role: mariadb
+      tags: [lamp, mariadb, db]
+
+    - role: phpmyadmin
+      tags: [lamp, phpmyadmin]

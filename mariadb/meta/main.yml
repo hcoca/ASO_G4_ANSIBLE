@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: Administrador de Sistemas
+  description: Despliegue y configuracion de MariaDB para openSUSE Leap 15.6 y 16.0
+  license: MIT
+  platforms:
+    - name: openSUSE Leap
+      versions:
+        - "15.6"
+        - "16.0"

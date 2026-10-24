@@ -1,0 +1,25 @@
+---
+# ==============================================================================
+# SENSITIVE CREDENTIALS (ANSIBLE VAULT)
+# To encrypt this file:
+#   ansible-vault encrypt group_vars/servidor/vault.yml
+# To run playbook with encrypted vault:
+#   ansible-playbook playbook.yml --ask-vault-pass
+# ==============================================================================
+
+# SSH connection password (replaces plain-text password from old hosts file)
+vault_ansible_password: "mundolibre"
+
+# MariaDB credentials
+vault_mariadb_root_password: "mundolibre"
+vault_mariadb_user_password: "mundolibre"
+
+# Samba credentials
+vault_samba_user_password: "mundolibre"
+
+# PostgreSQL credentials
+vault_postgresql_admin_password: "mundolibre"
+vault_postgresql_user_password: "mundolibre"
+
+# phpMyAdmin cookie encryption secret (32+ random characters)
+vault_phpmyadmin_secret: "k9J2bF8xW4vP1qZ7mD3yC6tR0sL5nE8h"

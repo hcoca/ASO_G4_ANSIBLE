@@ -1,19 +1,11 @@
-- name: Instalar vsftpd
-  zypper:
+---
+- name: Instalar vsftpd en openSUSE
+  community.general.zypper:
     name: "{{ vsftpd_package }}"
     state: present
 
-- name: Copiar archivo de configuración de vsftpd
-  template:
-    src: /etc/vsftpd.conf
-    dest: /etc/vsftpd.conf
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Reiniciar vsftpd
-
 - name: Habilitar y arrancar el servicio vsftpd
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ vsftpd_service }}"
-    enabled: yes
+    enabled: true
     state: started

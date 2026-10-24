@@ -1,0 +1,11 @@
+---
+# Defaults for phpMyAdmin role
+phpmyadmin_packages:
+  - phpMyAdmin
+  - phpMyAdmin-apache
+
+phpmyadmin_conf_dir: /etc/phpMyAdmin
+phpmyadmin_apache_conf_dir: /etc/apache2/conf.d
+
+# Blowfish secret for cookie authentication (override in vault.yml)
+phpmyadmin_blowfish_secret: "{{ vault_phpmyadmin_secret | default('k9J2bF8xW4vP1qZ7mD3yC6tR0sL5nE8h') }}"

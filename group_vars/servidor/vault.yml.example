@@ -1,0 +1,7 @@
+---
+# Template for vault.yml
+vault_ansible_password: "CHANGEME_SSH_PASSWORD"
+vault_mariadb_root_password: "CHANGEME_ROOT_DB_PASS"
+vault_mariadb_user_password: "CHANGEME_APP_DB_PASS"
+vault_samba_user_password: "CHANGEME_SAMBA_PASS"
+vault_phpmyadmin_secret: "CHANGEME_32_CHAR_RANDOM_BLOWFISH_SECRET"

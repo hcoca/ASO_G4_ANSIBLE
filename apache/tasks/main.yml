@@ -1,0 +1,37 @@
+---
+- name: Instalar Apache y modulos PHP en openSUSE
+  community.general.zypper:
+    name: "{{ apache_packages }}"
+    state: present
+
+- name: Habilitar modulo php8 en Apache
+  ansible.builtin.command: a2enmod php8
+  register: a2enmod_result
+  changed_when: "'already' not in a2enmod_result.stdout and 'already' not in a2enmod_result.stderr"
+  notify: Reiniciar apache2
+
+- name: Asegurar que el directorio DocumentRoot existe
+  ansible.builtin.file:
+    path: "{{ apache_document_root }}"
+    state: directory
+    owner: wwwrun
+    group: www
+    mode: '0755'
+
+- name: Habilitar y arrancar servicio Apache2
+  ansible.builtin.systemd:
+    name: "{{ apache_service }}"
+    enabled: true
+    state: started
+
+- name: Permitir trafico HTTP/HTTPS en firewalld si esta activo
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - http
+    - https
+  when: ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
+  ignore_errors: true
