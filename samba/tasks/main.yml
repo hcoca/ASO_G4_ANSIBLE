@@ -1,0 +1,61 @@
+---
+# ==============================================================================
+# Role Tasks: Samba Configuration on openSUSE Leap 15.6 / 16.0
+# ==============================================================================
+
+- name: Instalar paquetes de Samba en openSUSE
+  community.general.zypper:
+    name: "{{ samba_packages }}"
+    state: present
+
+- name: Crear grupo de sistema para Samba
+  ansible.builtin.group:
+    name: "{{ samba_system_group }}"
+    state: present
+
+- name: Crear usuario de sistema para Samba
+  ansible.builtin.user:
+    name: "{{ samba_system_user }}"
+    group: "{{ samba_system_group }}"
+    shell: "{{ samba_system_user_shell }}"
+    create_home: false
+    state: present
+
+- name: Crear directorio para el recurso compartido Samba
+  ansible.builtin.file:
+    path: "{{ samba_share_path }}"
+    state: directory
+    owner: "{{ samba_system_user }}"
+    group: "{{ samba_system_group }}"
+    mode: "{{ samba_directory_mask }}"
+
+- name: Comprobar si el usuario existe en la base de datos de Samba
+  ansible.builtin.command: "pdbedit -L -u {{ samba_system_user }}"
+  register: samba_user_check
+  failed_when: false
+  changed_when: false
+
+- name: Crear usuario de Samba y asignar contrasena (sin mostrar en logs)
+  ansible.builtin.shell: |
+    set -o pipefail
+    (echo '{{ samba_user_password }}'; echo '{{ samba_user_password }}') | smbpasswd -s -a {{ samba_system_user }}
+  when: samba_user_check.rc != 0
+  no_log: true
+  args:
+    executable: /bin/bash
+
+- name: Habilitar y arrancar servicios de Samba (smb y nmb)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ samba_services }}"
+
+- name: Permitir servicio samba en firewalld si esta activo
+  ansible.posix.firewalld:
+    service: samba
+    permanent: true
+    state: enabled
+    immediate: true
+  when: ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
+  ignore_errors: true

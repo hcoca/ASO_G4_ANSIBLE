@@ -1,0 +1,34 @@
+---
+# Defaults for Samba role on openSUSE
+samba_packages:
+  - samba
+  - samba-client
+
+samba_services:
+  - smb
+  - nmb
+
+samba_workgroup: WORKGROUP
+samba_server_string: "openSUSE Samba Server"
+samba_netbios_name: "OPENSUSE-SRV"
+
+# System user & group settings
+samba_system_group: smbgroup
+samba_system_user: smbuser
+samba_system_user_shell: /sbin/nologin
+
+# Samba user password (override in vault.yml)
+samba_user_password: "{{ vault_samba_user_password | default('SambaPassword2026!') }}"
+
+# Share configuration
+samba_share_name: compartido
+samba_share_path: /srv/samba/compartido
+samba_share_comment: "Recurso compartido en openSUSE"
+samba_read_only: "no"
+samba_browsable: "yes"
+
+# File creation mask and directory mask
+samba_create_mask: "0664"
+samba_directory_mask: "0775"
+samba_force_create_mode: "0664"
+samba_force_directory_mode: "0775"
