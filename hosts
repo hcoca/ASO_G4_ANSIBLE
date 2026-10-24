@@ -1,0 +1,6 @@
+[servidor]
+192.168.88.141  ansible_user=root ansible_password=mundolibre ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[respaldo]
+192.168.88.21
+192.168.88.22

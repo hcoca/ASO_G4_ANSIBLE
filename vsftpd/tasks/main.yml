@@ -1,0 +1,19 @@
+- name: Instalar vsftpd
+  zypper:
+    name: "{{ vsftpd_package }}"
+    state: present
+
+- name: Copiar archivo de configuración de vsftpd
+  template:
+    src: /etc/vsftpd.conf
+    dest: /etc/vsftpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reiniciar vsftpd
+
+- name: Habilitar y arrancar el servicio vsftpd
+  systemd:
+    name: "{{ vsftpd_service }}"
+    enabled: yes
+    state: started

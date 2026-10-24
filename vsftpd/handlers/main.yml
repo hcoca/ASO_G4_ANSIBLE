@@ -1,0 +1,4 @@
+- name: Reiniciar vsftpd
+  systemd:
+    name: "{{ vsftpd_service }}"
+    state: restarted

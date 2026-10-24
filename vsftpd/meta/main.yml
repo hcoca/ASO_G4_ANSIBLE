@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: Administrador del Centro de Cómputo
+  description: Rol para instalar y configurar vsftpd en openSUSE Leap 15.6
+  license: MIT
+  platforms:
+    - name: openSUSE Leap
+      versions:
+        - 15.6
