@@ -44,6 +44,17 @@
   args:
     executable: /bin/bash
 
+- name: Desplegar archivo de configuracion /etc/samba/smb.conf
+  ansible.builtin.template:
+    src: smb.conf
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reiniciar smb
+    - Reiniciar nmb
+
 - name: Habilitar y arrancar servicios de Samba (smb y nmb)
   ansible.builtin.systemd:
     name: "{{ item }}"

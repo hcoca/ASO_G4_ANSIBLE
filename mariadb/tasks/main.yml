@@ -22,6 +22,15 @@
   no_log: true
   ignore_errors: true
 
+- name: Crear archivo /root/.my.cnf para autenticacion segura
+  ansible.builtin.template:
+    src: root_my.cnf
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+
 - name: Eliminar usuarios anonimos de MariaDB
   community.mysql.mysql_user:
     name: ''

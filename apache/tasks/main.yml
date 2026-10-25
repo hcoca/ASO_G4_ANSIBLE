@@ -18,6 +18,14 @@
     group: www
     mode: '0755'
 
+- name: Desplegar pagina de prueba PHP
+  ansible.builtin.template:
+    src: index.php
+    dest: "{{ apache_document_root }}/index.php"
+    owner: wwwrun
+    group: www
+    mode: '0644'
+
 - name: Habilitar y arrancar servicio Apache2
   ansible.builtin.systemd:
     name: "{{ apache_service }}"
