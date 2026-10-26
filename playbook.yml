@@ -1,9 +1,9 @@
 ---
 # ==============================================================================
 # Ansible Playbook: Despliegue LAMP en openSUSE Leap 15.6 / 16.0
-# Task 3: Apache, PHP, phpMyAdmin, MariaDB y VSFTPD
+# Task 5: Apache, PHP, phpMyAdmin, MariaDB, Samba, VSFTPD y PostgreSQL
 # ==============================================================================
-- name: Desplegar infraestructura LAMP y FTP (Apache, PHP, MariaDB, phpMyAdmin y vsftpd)
+- name: Desplegar infraestructura de servicios (LAMP, Samba, FTP y PostgreSQL)
   hosts: servidor
   become: true
   roles:
@@ -21,3 +21,6 @@
 
     - role: samba
       tags: [samba, smb]
+
+    - role: postgresql
+      tags: [postgresql, db]

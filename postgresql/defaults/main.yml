@@ -1,0 +1,35 @@
+---
+# Defaults for PostgreSQL role
+
+# Packages to install
+postgresql_packages:
+  - postgresql
+  - postgresql-server
+  - postgresql-contrib
+  - php-pgsql
+  - "python{{ ansible_facts.python.version.major }}{{ ansible_facts.python.version.minor }}-psycopg2"
+
+postgresql_service: postgresql
+
+# Credentials should be overridden in group_vars/servidor/vault.yml
+postgresql_admin_password: "{{ vault_postgresql_admin_password | default('PgAdminPassword2026!') }}"
+
+# Application database and user configuration
+postgresql_database: "{{ postgresql_db_name | default('app_db') }}"
+postgresql_user: "{{ postgresql_db_user | default('app_user') }}"
+postgresql_password: "{{ vault_postgresql_user_password | default('PgUserPassword2026!') }}"
+
+# Network configuration for remote access
+postgresql_listen_addresses: "*"
+postgresql_port: 5432
+
+# HBA (Host-Based Authentication) rules for remote connections
+postgresql_hba_entries:
+  - { type: "local", database: "all", user: "postgres", method: "peer" }
+  - { type: "local", database: "all", user: "all", method: "md5" }
+  - { type: "host", database: "all", user: "all", address: "127.0.0.1/32", method: "scram-sha-256" }
+  - { type: "host", database: "all", user: "all", address: "::1/128", method: "scram-sha-256" }
+  - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "scram-sha-256" }
+
+# SSL/TLS encryption
+postgresql_ssl: "on"

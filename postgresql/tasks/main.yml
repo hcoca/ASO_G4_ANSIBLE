@@ -1,0 +1,98 @@
+---
+- name: Instalar PostgreSQL y dependencias
+  community.general.zypper:
+    name: "{{ postgresql_packages }}"
+    state: present
+
+- name: Verificar si el cluster de PostgreSQL esta inicializado
+  ansible.builtin.stat:
+    path: /var/lib/pgsql/data/PG_VERSION
+  register: pg_data_dir
+
+- name: Inicializar el cluster de PostgreSQL
+  ansible.builtin.command: /usr/bin/initdb -D /var/lib/pgsql/data
+  become: true
+  become_user: postgres
+  when: not pg_data_dir.stat.exists
+
+- name: Habilitar y arrancar el servicio PostgreSQL
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service }}"
+    enabled: true
+    state: started
+
+# ========================================================================
+# Configurar contrasena del usuario postgres
+# ========================================================================
+- name: Establecer contrasena del usuario postgres
+  ansible.builtin.command: >
+    psql -c "ALTER USER postgres WITH PASSWORD '{{ postgresql_admin_password }}';"
+  become: true
+  become_user: postgres
+  no_log: true
+  changed_when: true
+
+# ========================================================================
+# Configurar conexion remota y cifrado
+# ========================================================================
+- name: Configurar postgresql.conf para conexiones remotas y SSL
+  ansible.builtin.template:
+    src: postgresql.conf
+    dest: /var/lib/pgsql/data/postgresql.conf
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  notify: Reiniciar postgresql
+
+- name: Desplegar archivo pg_hba.conf para autenticacion segura
+  ansible.builtin.template:
+    src: pg_hba.conf
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  notify: Recargar postgresql
+
+# ========================================================================
+# Crear base de datos y usuario de aplicacion
+# ========================================================================
+- name: Crear base de datos de aplicacion
+  community.postgresql.postgresql_db:
+    name: "{{ postgresql_database }}"
+    state: present
+    encoding: UTF-8
+    lc_collate: en_US.UTF-8
+    lc_ctype: en_US.UTF-8
+  become: true
+  become_user: postgres
+
+- name: Crear usuario de aplicacion en PostgreSQL
+  community.postgresql.postgresql_user:
+    name: "{{ postgresql_user }}"
+    password: "{{ postgresql_password }}"
+    state: present
+    encrypted: true
+  become: true
+  become_user: postgres
+  no_log: true
+
+- name: Otorgar privilegios al usuario de aplicacion sobre la base de datos
+  community.postgresql.postgresql_privs:
+    database: "{{ postgresql_database }}"
+    type: database
+    roles: "{{ postgresql_user }}"
+    privs: ALL
+    state: present
+  become: true
+  become_user: postgres
+
+# ========================================================================
+# Firewall
+# ========================================================================
+- name: Abrir puerto de PostgreSQL en el firewall
+  ansible.posix.firewalld:
+    port: "{{ postgresql_port }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+  ignore_errors: true
