@@ -68,5 +68,4 @@
     permanent: true
     state: enabled
     immediate: true
-  when: ansible_facts.services['firewalld.service'] is defined and ansible_facts.services['firewalld.service'].state == 'running'
-  ignore_errors: true
+  when: firewalld_activo | default(false) | bool

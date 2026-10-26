@@ -15,6 +15,27 @@
   become_user: postgres
   when: not pg_data_dir.stat.exists
 
+# El certificado debe existir antes de arrancar el servicio con ssl = on
+- name: Generar certificado SSL autofirmado para PostgreSQL
+  ansible.builtin.command: >
+    openssl req -new -x509 -nodes -days {{ postgresql_ssl_days }}
+    -subj "/CN={{ ansible_facts.fqdn | default(inventory_hostname) }}"
+    -keyout {{ postgresql_ssl_key_file }}
+    -out {{ postgresql_ssl_cert_file }}
+  args:
+    creates: "{{ postgresql_ssl_cert_file }}"
+  become: true
+  become_user: postgres
+  when: postgresql_ssl | string | lower in ['on', 'true', 'yes']
+
+- name: Asegurar permisos de la clave privada SSL
+  ansible.builtin.file:
+    path: "{{ postgresql_ssl_key_file }}"
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  when: postgresql_ssl | string | lower in ['on', 'true', 'yes']
+
 - name: Habilitar y arrancar el servicio PostgreSQL
   ansible.builtin.systemd:
     name: "{{ postgresql_service }}"
@@ -95,4 +116,4 @@
     permanent: true
     immediate: true
     state: enabled
-  ignore_errors: true
+  when: firewalld_activo | default(false) | bool

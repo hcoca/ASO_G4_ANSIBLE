@@ -2,6 +2,11 @@
 # Non-sensitive variables for host group 'servidor'
 # Target OS: OpenSUSE Leap 15.6 / OpenSUSE Leap 16.0
 
+# Firewall settings
+# false: se detiene firewalld y se omiten las reglas de firewall (pruebas)
+# true: se gestionan las reglas de firewalld si el servicio esta activo
+gestionar_firewall: false
+
 # Apache / PHP settings
 apache_port: 80
 apache_server_admin: admin@local.net

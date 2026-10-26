@@ -1,11 +1,33 @@
 ---
 # ==============================================================================
-# Ansible Playbook: Despliegue LAMP en openSUSE Leap 15.6 / 16.0
-# Task 5: Apache, PHP, phpMyAdmin, MariaDB, Samba, VSFTPD y PostgreSQL
+# Ansible Playbook: Despliegue de Servicios en openSUSE Leap 15.6 / 16.0
+# Servicios: VSFTPD, Apache, PHP, MariaDB, phpMyAdmin, Samba, PostgreSQL
 # ==============================================================================
 - name: Desplegar infraestructura de servicios (LAMP, Samba, FTP y PostgreSQL)
   hosts: servidor
   become: true
+  pre_tasks:
+    - name: Detener y deshabilitar firewalld para las pruebas
+      ansible.builtin.systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+      when: not (gestionar_firewall | default(true) | bool)
+      failed_when: false
+      tags: always
+
+    - name: Recopilar estado de los servicios
+      ansible.builtin.service_facts:
+      tags: always
+
+    - name: Determinar si firewalld esta activo
+      ansible.builtin.set_fact:
+        firewalld_activo: >-
+          {{ (gestionar_firewall | default(true) | bool) and
+             ansible_facts.services['firewalld.service'] is defined and
+             ansible_facts.services['firewalld.service'].state == 'running' }}
+      tags: always
+
   roles:
     - role: vsftpd
       tags: [ftp, vsftpd]
@@ -24,3 +46,4 @@
 
     - role: postgresql
       tags: [postgresql, db]
+

@@ -15,4 +15,3 @@ apache_packages:
 apache_service: apache2
 apache_document_root: /srv/www/htdocs
 apache_server_admin: webmaster@localhost
-apache_enable_firewalld: true
